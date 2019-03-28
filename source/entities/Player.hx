@@ -3,6 +3,7 @@ package entities;
 import haxepunk.*;
 import haxepunk.input.*;
 import haxepunk.graphics.*;
+import haxepunk.masks.*;
 import haxepunk.math.*;
 import haxepunk.Tween;
 import haxepunk.tweens.misc.*;
@@ -23,9 +24,11 @@ class Player extends Entity {
         sprite.add("jump", [1]);
         sprite.play("idle");
         graphic = sprite;
+        sprite.x = -16;
+        sprite.y = -1;
 
         velocity = new Vector2(0, 0);
-        setHitbox(12, 24, -6, 0);
+        mask = new Hitbox(16, 32);
     }
 
     override public function update() {
