@@ -13,7 +13,6 @@ import scenes.*;
 class Player extends Entity {
     public static inline var RUN_SPEED = 100;
     public static inline var AIR_SPEED = 120;
-    public static inline var AIR_CONTROL = 0;
     public static inline var JUMP_POWER = 250;
     public static inline var GRAVITY = 800;
     public static inline var MAX_FALL_SPEED = 300;
@@ -28,6 +27,7 @@ class Player extends Entity {
         sprite.add("run", [2, 3, 1], 10);
         sprite.add("jump", [9]);
         sprite.add("fall", [10]);
+        sprite.add("crouch", [6]);
         sprite.play("idle");
         graphic = sprite;
         sprite.x = -16;
@@ -45,7 +45,10 @@ class Player extends Entity {
 
     public function movement() {
         if(isOnGround()) {
-            if(Main.inputCheck("left")) {
+            if(Main.inputCheck("down")) {
+                velocity.x = 0;
+            }
+            else if(Main.inputCheck("left")) {
                 velocity.x = -RUN_SPEED;
             }
             else if(Main.inputCheck("right")) {
@@ -67,12 +70,6 @@ class Player extends Entity {
             }
         }
         else {
-            if(Main.inputCheck("left")) {
-                velocity.x -= AIR_CONTROL * HXP.elapsed;
-            }
-            else if(Main.inputCheck("right")) {
-                velocity.x += AIR_CONTROL * HXP.elapsed;
-            }
             velocity.y = Math.min(
                 velocity.y + GRAVITY * HXP.elapsed,
                 MAX_FALL_SPEED
@@ -100,7 +97,12 @@ class Player extends Entity {
             sprite.flipX = velocity.x < 0;
         }
         else {
-            sprite.play("idle");
+            if(Main.inputCheck("down")) {
+                sprite.play("crouch");
+            }
+            else {
+                sprite.play("idle");
+            }
         }
     }
 }
