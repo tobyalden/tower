@@ -18,10 +18,16 @@ class Player extends Entity {
     public static inline var GRAVITY = 800;
     public static inline var MAX_FALL_SPEED = 300;
 
+    public static inline var ATTACK_DELAY = 0.15;
+    public static inline var ATTACK_DURATION = 0.2;
+
     private var sprite:Spritemap;
     private var velocity:Vector2;
     private var jumpDelay:Alarm;
-    private var isJumping:Bool;
+    private var attackDelay:Alarm;
+    private var attackDuration:Alarm;
+    private var jumpThisFrame:Bool;
+    private var attackThisFrame:Bool;
 
     public function new(x:Int, y:Int) {
 	    super(x, y);
@@ -31,6 +37,9 @@ class Player extends Entity {
         sprite.add("jump", [9]);
         sprite.add("fall", [10]);
         sprite.add("crouch", [6]);
+        sprite.add("preattack", [4]);
+        sprite.add("attack", [5]);
+        sprite.add("crouchattack", [7]);
         sprite.play("idle");
         graphic = sprite;
         sprite.x = -16;
@@ -41,11 +50,21 @@ class Player extends Entity {
 
         jumpDelay = new Alarm(JUMP_DELAY, TweenType.Persist);
         jumpDelay.onComplete.bind(function() {
-            isJumping = true;
+            jumpThisFrame = true;
 
         });
         addTween(jumpDelay);
-        isJumping = false;
+        jumpThisFrame = false;
+
+        attackDelay = new Alarm(ATTACK_DELAY, TweenType.Persist);
+        attackDelay.onComplete.bind(function() {
+            attackThisFrame = true;
+        });
+        addTween(attackDelay);
+        attackThisFrame = false;
+
+        attackDuration = new Alarm(ATTACK_DURATION, TweenType.Persist);
+        addTween(attackDuration);
     }
 
     override public function update() {
@@ -56,7 +75,12 @@ class Player extends Entity {
 
     public function movement() {
         if(isOnGround()) {
-            if(Main.inputCheck("down") || jumpDelay.active) {
+            if(
+                Main.inputCheck("down")
+                || jumpDelay.active
+                || attackDelay.active
+                || attackDuration.active
+            ) {
                 velocity.x = 0;
             }
             else if(Main.inputCheck("left")) {
@@ -69,9 +93,9 @@ class Player extends Entity {
                 velocity.x = 0;
             }
 
-            if(isJumping) {
+            if(jumpThisFrame) {
                 jump();
-                isJumping = false;
+                jumpThisFrame = false;
             }
             else {
                 velocity.y = 0;
@@ -88,6 +112,14 @@ class Player extends Entity {
             );
         }
 
+        if(attackThisFrame) {
+            attack();
+            attackThisFrame = false;
+        }
+        if(Main.inputPressed("action") && !attackDelay.active) {
+            attackDelay.start();
+        }
+
         moveBy(velocity.x * HXP.elapsed, velocity.y * HXP.elapsed, "walls");
     }
 
@@ -101,13 +133,27 @@ class Player extends Entity {
         }
     }
 
+    private function attack() {
+        attackDuration.start();
+    }
 
     private function isOnGround() {
         return collide("walls", x, y + 1) != null;
     }
 
     public function animation() {
-        if(jumpDelay.active) {
+        if(attackDuration.active) {
+            if(Main.inputCheck("down")) {
+                sprite.play("crouchattack");
+            }
+            else {
+                sprite.play("attack");
+            }
+        }
+        else if(attackDelay.active) {
+            sprite.play("preattack");
+        }
+        else if(jumpDelay.active) {
             sprite.play("crouch");
         }
         else if(!isOnGround()) {
