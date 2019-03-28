@@ -1,10 +1,10 @@
 <project> 
 	<name>Memory</name> 
 	<settings> 
-		<defaultWidth>640</defaultWidth> 
-		<defaultHeight>352</defaultHeight>
-		<maxWidth>6400</maxWidth> 
-		<maxHeight>3520</maxHeight> 
+		<defaultWidth>160</defaultWidth> 
+		<defaultHeight>160</defaultHeight> 
+		<maxWidth>160</maxWidth> 
+		<maxHeight>160</maxHeight> 
 		<workingDirectory>.</workingDirectory> 
 	</settings> 
 	<layers> 

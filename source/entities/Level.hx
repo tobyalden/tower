@@ -11,6 +11,8 @@ import scenes.*;
 
 class Level extends Entity {
     public static inline var TILE_SIZE = 16;
+    public static inline var MIN_LEVEL_WIDTH = 640;
+    public static inline var MIN_LEVEL_HEIGHT = 352;
 
     public var walls(default, null):Grid;
     private var tiles:Tilemap;
@@ -18,7 +20,8 @@ class Level extends Entity {
     public function new(x:Int, y:Int) {
         super(x, y);
         type = "walls";
-        loadLevel("test");
+        loadLevel("0");
+        updateGraphic();
         mask = walls;
         graphic = tiles;
     }
@@ -38,8 +41,9 @@ class Level extends Entity {
                 Std.int(Std.parseInt(r.att.h) / TILE_SIZE)
             );
         }
+    }
 
-        // Load graphics
+    public function updateGraphic() {
         tiles = new Tilemap(
             'graphics/tiles.png',
             walls.width, walls.height, walls.tileWidth, walls.tileHeight
