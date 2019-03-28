@@ -15,7 +15,7 @@ class Player extends Entity {
     private var sprite:Spritemap;
     private var velocity:Vector2;
 
-    public function new(x:Float, y:Float) {
+    public function new(x:Int, y:Int) {
 	    super(x, y);
         sprite = new Spritemap("graphics/player.png", 48, 33);
         sprite.add("idle", [0]);
@@ -44,7 +44,7 @@ class Player extends Entity {
         else {
             velocity.x = 0;
         }
-        moveBy(velocity.x * HXP.elapsed, velocity.y * HXP.elapsed);
+        moveBy(velocity.x * HXP.elapsed, velocity.y * HXP.elapsed, "walls");
     }
 
     public function animation() {
