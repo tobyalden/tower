@@ -1,0 +1,7 @@
+.DS_Store
+project.xml.hxml
+bin/
+dump/
+.asd
+.vscode/
+export/
