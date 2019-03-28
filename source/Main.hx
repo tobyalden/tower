@@ -48,9 +48,9 @@ class Main extends Engine {
             Sys.exit(0);
         }
 #end
-        super.update();
         lastVerticalAxis = gamepad != null ? gamepad.getAxis(1) : 0;
         lastHorizontalAxis = gamepad != null ? gamepad.getAxis(0) : 0;
+        super.update();
     }
 
     public static function inputPressed(inputName:String) {
