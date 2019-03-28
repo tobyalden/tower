@@ -14,11 +14,14 @@ class Player extends Entity {
     public static inline var RUN_SPEED = 100;
     public static inline var AIR_SPEED = 120;
     public static inline var JUMP_POWER = 250;
+    public static inline var JUMP_DELAY = 0.15;
     public static inline var GRAVITY = 800;
     public static inline var MAX_FALL_SPEED = 300;
 
     private var sprite:Spritemap;
     private var velocity:Vector2;
+    private var jumpDelay:Alarm;
+    private var isJumping:Bool;
 
     public function new(x:Int, y:Int) {
 	    super(x, y);
@@ -35,6 +38,14 @@ class Player extends Entity {
 
         velocity = new Vector2(0, 0);
         mask = new Hitbox(16, 32);
+
+        jumpDelay = new Alarm(JUMP_DELAY, TweenType.Persist);
+        jumpDelay.onComplete.bind(function() {
+            isJumping = true;
+
+        });
+        addTween(jumpDelay);
+        isJumping = false;
     }
 
     override public function update() {
@@ -45,7 +56,7 @@ class Player extends Entity {
 
     public function movement() {
         if(isOnGround()) {
-            if(Main.inputCheck("down")) {
+            if(Main.inputCheck("down") || jumpDelay.active) {
                 velocity.x = 0;
             }
             else if(Main.inputCheck("left")) {
@@ -58,15 +69,16 @@ class Player extends Entity {
                 velocity.x = 0;
             }
 
-            velocity.y = 0;
-            if(Main.inputPressed("jump")) {
-                velocity.y = -JUMP_POWER;
-                if(Main.inputCheck("left")) {
-                    velocity.x = -AIR_SPEED;
-                }
-                else if(Main.inputCheck("right")) {
-                    velocity.x = AIR_SPEED;
-                }
+            if(isJumping) {
+                jump();
+                isJumping = false;
+            }
+            else {
+                velocity.y = 0;
+            }
+
+            if(Main.inputPressed("jump") && !jumpDelay.active) {
+                jumpDelay.start();
             }
         }
         else {
@@ -79,12 +91,26 @@ class Player extends Entity {
         moveBy(velocity.x * HXP.elapsed, velocity.y * HXP.elapsed, "walls");
     }
 
+    private function jump() {
+        velocity.y = -JUMP_POWER;
+        if(Main.inputCheck("left")) {
+            velocity.x = -AIR_SPEED;
+        }
+        else if(Main.inputCheck("right")) {
+            velocity.x = AIR_SPEED;
+        }
+    }
+
+
     private function isOnGround() {
         return collide("walls", x, y + 1) != null;
     }
 
     public function animation() {
-        if(!isOnGround()) {
+        if(jumpDelay.active) {
+            sprite.play("crouch");
+        }
+        else if(!isOnGround()) {
             if(velocity.y < 0) {
                 sprite.play("jump");
             }
