@@ -16,12 +16,13 @@ class GameScene extends Scene {
         placeLevels();
         player = new Player(100, 100);
         add(player);
+        camera.pixelSnapping = true;
 	}
 
     override public function update() {
-        camera.x = player.centerX - HXP.width / 2;
-        camera.y = player.centerY - HXP.height / 2;
         super.update();
+        camera.x = Math.floor(player.centerX - HXP.width / 2);
+        camera.y = Math.floor(player.centerY - HXP.height / 2);
     }
 
     private function loadMap(mapNumber:Int) {
