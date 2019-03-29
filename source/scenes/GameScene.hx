@@ -48,6 +48,23 @@ class GameScene extends Scene {
         }
     }
 
+    private function sealLevel(
+        level:Level, tileX:Int, tileY:Int, checkX:Int, checkY:Int
+    ) {
+        if(!mapBlueprint.getTile(tileX + checkX - 1, tileY + checkY)) {
+            level.fillLeft(checkY);
+        }
+        if(!mapBlueprint.getTile(tileX + checkX + 1, tileY + checkY)) {
+            level.fillRight(checkY);
+        }
+        if(!mapBlueprint.getTile(tileX + checkX, tileY + checkY - 1)) {
+            level.fillTop(checkX);
+        }
+        if(!mapBlueprint.getTile(tileX + checkX, tileY + checkY + 1)) {
+            level.fillBottom(checkX);
+        }
+    }
+
     private function placeLevels() {
         allLevels = new Array<Level>();
         for(tileX in 0...mapBlueprint.columns) {
@@ -89,9 +106,9 @@ class GameScene extends Scene {
                                     map.setTile(
                                         tileX + checkX, tileY + checkY
                                     );
-                                    //sealLevel(
-                                        //level, tileX, tileY, checkX, checkY
-                                    //);
+                                    sealLevel(
+                                        level, tileX, tileY, checkX, checkY
+                                    );
                                 }
                             }
                             level.updateGraphic();

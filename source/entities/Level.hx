@@ -11,8 +11,10 @@ import scenes.*;
 
 class Level extends Entity {
     public static inline var TILE_SIZE = 16;
-    public static inline var MIN_LEVEL_WIDTH = 640;
-    public static inline var MIN_LEVEL_HEIGHT = 352;
+    public static inline var MIN_LEVEL_WIDTH = 320;
+    public static inline var MIN_LEVEL_HEIGHT = 176;
+    public static inline var MIN_LEVEL_WIDTH_IN_TILES = 20;
+    public static inline var MIN_LEVEL_HEIGHT_IN_TILES = 11;
 
     public var walls(default, null):Grid;
     public var entities(default, null):Array<Entity>;
@@ -92,11 +94,41 @@ class Level extends Entity {
         }
     }
 
+    public function fillLeft(offsetY:Int) {
+        for(tileY in 0...MIN_LEVEL_HEIGHT_IN_TILES) {
+            walls.setTile(0, tileY + offsetY * MIN_LEVEL_HEIGHT_IN_TILES);
+        }
+    }
+
+    public function fillRight(offsetY:Int) {
+        for(tileY in 0...MIN_LEVEL_HEIGHT_IN_TILES) {
+            walls.setTile(
+                walls.columns - 1,
+                tileY + offsetY * MIN_LEVEL_HEIGHT_IN_TILES);
+        }
+    }
+
+    public function fillTop(offsetX:Int) {
+        for(tileX in 0...MIN_LEVEL_WIDTH_IN_TILES) {
+            walls.setTile(tileX + offsetX * MIN_LEVEL_WIDTH_IN_TILES, 0);
+        }
+    }
+
+    public function fillBottom(offsetX:Int) {
+        for(tileX in 0...MIN_LEVEL_WIDTH_IN_TILES) {
+            walls.setTile(
+                tileX + offsetX * MIN_LEVEL_WIDTH_IN_TILES,
+                walls.rows - 1
+            );
+        }
+    }
+
     public function updateGraphic() {
         tiles = new Tilemap(
             'graphics/tiles.png',
             walls.width, walls.height, walls.tileWidth, walls.tileHeight
         );
         tiles.loadFromString(walls.saveToString(',', '\n', '1', '0'));
+        graphic = tiles;
     }
 }

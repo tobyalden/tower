@@ -1,8 +1,8 @@
 <project> 
 	<name>Memory</name> 
 	<settings> 
-		<defaultWidth>640</defaultWidth> 
-		<defaultHeight>352</defaultHeight>
+		<defaultWidth>320</defaultWidth>
+		<defaultHeight>176</defaultHeight>
 		<maxWidth>6400</maxWidth> 
 		<maxHeight>3520</maxHeight> 
 		<workingDirectory>../editorgfx</workingDirectory>
