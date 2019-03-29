@@ -56,7 +56,6 @@ class GameScene extends Scene {
                     mapBlueprint.getTile(tileX, tileY)
                     && !map.getTile(tileX, tileY)
                 ) {
-                    trace('free spot found');
                     var canPlace = false;
                     while(!canPlace) {
                         var level = new Level(
@@ -97,7 +96,10 @@ class GameScene extends Scene {
                             }
                             level.updateGraphic();
                             add(level);
-                            trace('adding level');
+                            for(entity in level.entities) {
+                                entity.moveBy(level.x, level.y);
+                                add(entity);
+                            }
                             allLevels.push(level);
                         }
                     }

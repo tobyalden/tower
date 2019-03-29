@@ -5,10 +5,18 @@
 		<defaultHeight>352</defaultHeight>
 		<maxWidth>6400</maxWidth> 
 		<maxHeight>3520</maxHeight> 
-		<workingDirectory>.</workingDirectory> 
+		<workingDirectory>../editorgfx</workingDirectory>
 	</settings> 
+	<objects>
+		<object name="floorspikes" image="floorspikes.png" width="8" height="8" resizableX="true" tile="true"/>
+		<object name="ceilingspikes" image="ceilingspikes.png" width="8" height="8" resizableX="true" tile="true"/>
+		<object name="leftwallspikes" image="leftwallspikes.png" width="8" height="8" resizableY="true" tile="true"/>
+		<object name="rightwallspikes" image="rightwallspikes.png" width="8" height="8" resizableY="true" tile="true"/>
+	</objects>
 	<layers> 
 		<grid name="walls" gridSize="16" exportAsObjects="true"/>
+		<grid name="optionalWalls" gridSize="16" exportAsObjects="true" color="#FFFF0000"/>
+		<objects name="objects" gridSize="8"/>
 	</layers> 
 </project>
 
