@@ -30,23 +30,46 @@ class Level extends Entity {
         type = "walls";
         if(levelType == "room") {
             loadLevel('${
-                Std.int(Math.floor(Math.random() * NUMBER_OF_ROOMS))
+                Std.int(Math.floor(Random.random * NUMBER_OF_ROOMS))
             }');
         }
         else if(levelType == "hallway") {
             loadLevel('${
-                Std.int(Math.floor(Math.random() * NUMBER_OF_HALLWAYS))
+                Std.int(Math.floor(Random.random * NUMBER_OF_HALLWAYS))
             }');
         }
         else {
             // levelType == "shaft"
             loadLevel('${
-                Std.int(Math.floor(Math.random() * NUMBER_OF_SHAFTS))
+                Std.int(Math.floor(Random.random * NUMBER_OF_SHAFTS))
             }');
+        }
+        if(Random.random < 0.5) {
+            flipHorizontally();
         }
         updateGraphic();
         mask = walls;
         graphic = tiles;
+    }
+
+    public function flipHorizontally() {
+        for(tileX in 0...Std.int(walls.columns / 2)) {
+            for(tileY in 0...walls.rows) {
+                var tempLeft:Null<Bool> = walls.getTile(tileX, tileY);
+                // For some reason getTile() returns null instead of false!
+                if(tempLeft == null) {
+                    tempLeft = false;
+                }
+                var tempRight:Null<Bool> = walls.getTile(
+                    walls.columns - tileX - 1, tileY
+                );
+                if(tempRight == null) {
+                    tempRight = false;
+                }
+                walls.setTile(tileX, tileY, tempRight);
+                walls.setTile(walls.columns - tileX - 1, tileY, tempLeft);
+            }
+        }
     }
 
     private function loadLevel(levelName:String) {
