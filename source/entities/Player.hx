@@ -13,7 +13,7 @@ import scenes.*;
 class Player extends Entity {
     public static inline var RUN_SPEED = 100;
     public static inline var AIR_SPEED = 120;
-    public static inline var JUMP_POWER = 250;
+    public static inline var JUMP_POWER = 300;
     public static inline var JUMP_DELAY = 0.15;
     public static inline var GRAVITY = 800;
     public static inline var MAX_FALL_SPEED = 300;

@@ -2,6 +2,7 @@ package scenes;
 
 import entities.*;
 import haxepunk.*;
+import haxepunk.input.*;
 import haxepunk.masks.*;
 import openfl.Assets;
 
@@ -20,11 +21,19 @@ class GameScene extends Scene {
         player = new Player(50, 50);
         add(player);
         camera.pixelSnapping = true;
-        //camera.scale = 0.2;
+        Key.define("togglezoom", [Key.T]);
 	}
 
     override public function update() {
         super.update();
+        if(Input.pressed("togglezoom")) {
+            if(camera.scale == 1) {
+                camera.scale = 0.1;
+            }
+            else {
+                camera.scale = 1;
+            }
+        }
         camera.x = Math.floor(player.centerX - HXP.width / 2);
         camera.y = Math.floor(player.centerY - HXP.height / 2);
     }
