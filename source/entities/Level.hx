@@ -15,15 +15,35 @@ class Level extends Entity {
     public static inline var MIN_LEVEL_HEIGHT = 176;
     public static inline var MIN_LEVEL_WIDTH_IN_TILES = 20;
     public static inline var MIN_LEVEL_HEIGHT_IN_TILES = 11;
+    public static inline var NUMBER_OF_ROOMS = 2;
+    public static inline var NUMBER_OF_HALLWAYS = 1;
+    public static inline var NUMBER_OF_SHAFTS = 1;
 
     public var walls(default, null):Grid;
     public var entities(default, null):Array<Entity>;
     private var tiles:Tilemap;
+    private var levelType:String;
 
-    public function new(x:Int, y:Int) {
+    public function new(x:Int, y:Int, levelType:String) {
         super(x, y);
+        this.levelType = levelType;
         type = "walls";
-        loadLevel("0");
+        if(levelType == "room") {
+            loadLevel('${
+                Std.int(Math.floor(Math.random() * NUMBER_OF_ROOMS))
+            }');
+        }
+        else if(levelType == "hallway") {
+            loadLevel('${
+                Std.int(Math.floor(Math.random() * NUMBER_OF_HALLWAYS))
+            }');
+        }
+        else {
+            // levelType == "shaft"
+            loadLevel('${
+                Std.int(Math.floor(Math.random() * NUMBER_OF_SHAFTS))
+            }');
+        }
         updateGraphic();
         mask = walls;
         graphic = tiles;
@@ -31,7 +51,9 @@ class Level extends Entity {
 
     private function loadLevel(levelName:String) {
         // Load geometry
-        var xml = Xml.parse(Assets.getText('levels/${levelName}.oel'));
+        var xml = Xml.parse(Assets.getText(
+            'levels/${levelType}/${levelName}.oel'
+        ));
         var fastXml = new haxe.xml.Fast(xml.firstElement());
         var segmentWidth = Std.parseInt(fastXml.node.width.innerData);
         var segmentHeight = Std.parseInt(fastXml.node.height.innerData);
