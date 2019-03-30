@@ -64,6 +64,23 @@ class Level extends Entity {
         }
     }
 
+    private function findOpenSpotsOnFloor() {
+        for(tileX in 0...walls.columns) {
+            for(tileY in 0...walls.rows) {
+                if(
+                    !walls.getTile(tileX, tileY) // Is open
+                    && !walls.getTile(tileX - 1, tileY) // Open to left
+                    && !walls.getTile(tileX + 1, tileY) // Open to right
+                    && walls.getTile(tileX, tileY + 1) // Floor underneath
+                    && walls.getTile(tileX - 1, tileY + 1) // Floor to left
+                    && walls.getTile(tileX + 1, tileY + 1) // Floor to right
+                ) {
+                    tiles.setTile(tileX, tileY, 3);
+                }
+            }
+        }
+    }
+
     public function flipHorizontally(wallsToFlip:Grid) {
         for(tileX in 0...Std.int(wallsToFlip.columns / 2)) {
             for(tileY in 0...wallsToFlip.rows) {
@@ -215,6 +232,7 @@ class Level extends Entity {
                 }
             }
         }
+        findOpenSpotsOnFloor();
         graphic = tiles;
     }
 }
