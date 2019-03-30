@@ -116,7 +116,11 @@ class Player extends Entity {
             attack();
             attackThisFrame = false;
         }
-        if(Main.inputPressed("action") && !attackDelay.active) {
+        if(
+            Main.inputPressed("action")
+            && !attackDelay.active
+            && !attackDuration.active
+        ) {
             attackDelay.start();
         }
 

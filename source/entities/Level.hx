@@ -20,6 +20,7 @@ class Level extends Entity {
     public static inline var NUMBER_OF_SHAFTS = 2;
 
     public var walls(default, null):Grid;
+    public var pathUpWalls(default, null):Grid;
     public var entities(default, null):Array<Entity>;
     private var tiles:Tilemap;
     private var levelType:String;
@@ -45,29 +46,42 @@ class Level extends Entity {
             }');
         }
         if(Random.random < 0.5) {
-            flipHorizontally();
+            flipHorizontally(walls);
+            flipHorizontally(pathUpWalls);
         }
         updateGraphic();
         mask = walls;
         graphic = tiles;
     }
 
-    public function flipHorizontally() {
-        for(tileX in 0...Std.int(walls.columns / 2)) {
+    public function addPathsUp() {
+        for(tileX in 0...walls.columns) {
             for(tileY in 0...walls.rows) {
-                var tempLeft:Null<Bool> = walls.getTile(tileX, tileY);
+                if(pathUpWalls.getTile(tileX, tileY)) {
+                    walls.setTile(tileX, tileY);
+                }
+            }
+        }
+    }
+
+    public function flipHorizontally(wallsToFlip:Grid) {
+        for(tileX in 0...Std.int(wallsToFlip.columns / 2)) {
+            for(tileY in 0...wallsToFlip.rows) {
+                var tempLeft:Null<Bool> = wallsToFlip.getTile(tileX, tileY);
                 // For some reason getTile() returns null instead of false!
                 if(tempLeft == null) {
                     tempLeft = false;
                 }
-                var tempRight:Null<Bool> = walls.getTile(
-                    walls.columns - tileX - 1, tileY
+                var tempRight:Null<Bool> = wallsToFlip.getTile(
+                    wallsToFlip.columns - tileX - 1, tileY
                 );
                 if(tempRight == null) {
                     tempRight = false;
                 }
-                walls.setTile(tileX, tileY, tempRight);
-                walls.setTile(walls.columns - tileX - 1, tileY, tempLeft);
+                wallsToFlip.setTile(tileX, tileY, tempRight);
+                wallsToFlip.setTile(
+                    wallsToFlip.columns - tileX - 1, tileY, tempLeft
+                );
             }
         }
     }
@@ -81,6 +95,9 @@ class Level extends Entity {
         var segmentWidth = Std.parseInt(fastXml.node.width.innerData);
         var segmentHeight = Std.parseInt(fastXml.node.height.innerData);
         walls = new Grid(segmentWidth, segmentHeight, TILE_SIZE, TILE_SIZE);
+        pathUpWalls = new Grid(
+            segmentWidth, segmentHeight, TILE_SIZE, TILE_SIZE
+        );
         for (r in fastXml.node.walls.nodes.rect) {
             walls.setRect(
                 Std.int(Std.parseInt(r.att.x) / TILE_SIZE),
@@ -88,6 +105,16 @@ class Level extends Entity {
                 Std.int(Std.parseInt(r.att.w) / TILE_SIZE),
                 Std.int(Std.parseInt(r.att.h) / TILE_SIZE)
             );
+        }
+        if(levelType == "room") {
+            for (r in fastXml.node.pathUpWalls.nodes.rect) {
+                pathUpWalls.setRect(
+                    Std.int(Std.parseInt(r.att.x) / TILE_SIZE),
+                    Std.int(Std.parseInt(r.att.y) / TILE_SIZE),
+                    Std.int(Std.parseInt(r.att.w) / TILE_SIZE),
+                    Std.int(Std.parseInt(r.att.h) / TILE_SIZE)
+                );
+            }
         }
 
         // Load optional geometry
@@ -149,13 +176,20 @@ class Level extends Entity {
         for(tileY in 0...MIN_LEVEL_HEIGHT_IN_TILES) {
             walls.setTile(
                 walls.columns - 1,
-                tileY + offsetY * MIN_LEVEL_HEIGHT_IN_TILES);
+                tileY + offsetY * MIN_LEVEL_HEIGHT_IN_TILES
+            );
         }
     }
 
     public function fillTop(offsetX:Int) {
         for(tileX in 0...MIN_LEVEL_WIDTH_IN_TILES) {
             walls.setTile(tileX + offsetX * MIN_LEVEL_WIDTH_IN_TILES, 0);
+            // Clear paths up if not needed
+            for(tileY in 0...walls.rows) {
+                pathUpWalls.clearTile(
+                    tileX + offsetX * MIN_LEVEL_WIDTH_IN_TILES, tileY
+                );
+            }
         }
     }
 
@@ -174,6 +208,13 @@ class Level extends Entity {
             walls.width, walls.height, walls.tileWidth, walls.tileHeight
         );
         tiles.loadFromString(walls.saveToString(',', '\n', '1', '0'));
+        for(tileX in 0...walls.columns) {
+            for(tileY in 0...walls.rows) {
+                if(pathUpWalls.getTile(tileX, tileY)) {
+                    tiles.setTile(tileX, tileY, 2);
+                }
+            }
+        }
         graphic = tiles;
     }
 }

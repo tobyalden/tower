@@ -16,6 +16,7 @@
 	<layers> 
 		<grid name="walls" gridSize="16" exportAsObjects="true"/>
 		<grid name="optionalWalls" gridSize="16" exportAsObjects="true" color="#FFFF0000"/>
+		<grid name="pathUpWalls" gridSize="16" exportAsObjects="true" color="#FFFF00FF"/>
 		<objects name="objects" gridSize="8"/>
 	</layers> 
 </project>

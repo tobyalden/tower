@@ -27,12 +27,7 @@ class GameScene extends Scene {
     override public function update() {
         super.update();
         if(Input.pressed("togglezoom")) {
-            if(camera.scale == 1) {
-                camera.scale = 0.1;
-            }
-            else {
-                camera.scale = 1;
-            }
+            camera.scale = camera.scale == 1 ? 0.1 : 1;
         }
         camera.x = Math.floor(player.centerX - HXP.width / 2);
         camera.y = Math.floor(player.centerY - HXP.height / 2);
@@ -104,16 +99,28 @@ class GameScene extends Scene {
     private function sealLevel(
         level:Level, tileX:Int, tileY:Int, checkX:Int, checkY:Int
     ) {
-        if(!allBlueprint.getTile(tileX + checkX - 1, tileY + checkY)) {
+        if(
+            !roomMapBlueprint.getTile(tileX + checkX - 1, tileY + checkY)
+            && !hallwayMapBlueprint.getTile(tileX + checkX - 1, tileY + checkY)
+        ) {
             level.fillLeft(checkY);
         }
-        if(!allBlueprint.getTile(tileX + checkX + 1, tileY + checkY)) {
+        if(
+            !roomMapBlueprint.getTile(tileX + checkX + 1, tileY + checkY)
+            && !hallwayMapBlueprint.getTile(tileX + checkX + 1, tileY + checkY)
+        ) {
             level.fillRight(checkY);
         }
-        if(!allBlueprint.getTile(tileX + checkX, tileY + checkY - 1)) {
+        if(
+            !roomMapBlueprint.getTile(tileX + checkX, tileY + checkY - 1)
+            && !shaftMapBlueprint.getTile(tileX + checkX, tileY + checkY - 1)
+        ) {
             level.fillTop(checkX);
         }
-        if(!allBlueprint.getTile(tileX + checkX, tileY + checkY + 1)) {
+        if(
+            !roomMapBlueprint.getTile(tileX + checkX, tileY + checkY + 1)
+            && !shaftMapBlueprint.getTile(tileX + checkX, tileY + checkY + 1)
+        ) {
             level.fillBottom(checkX);
         }
     }
@@ -172,6 +179,7 @@ class GameScene extends Scene {
                                         );
                                     }
                                 }
+                                level.addPathsUp();
                                 level.updateGraphic();
                                 add(level);
                                 for(entity in level.entities) {
