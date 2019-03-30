@@ -21,6 +21,7 @@ class Player extends Entity {
     public static inline var ATTACK_DELAY = 0.15;
     public static inline var ATTACK_DURATION = 0.2;
 
+    public var hurtBox(default, null):Entity;
     private var sprite:Spritemap;
     private var velocity:Vector2;
     private var jumpDelay:Alarm;
@@ -65,11 +66,28 @@ class Player extends Entity {
 
         attackDuration = new Alarm(ATTACK_DURATION, TweenType.Persist);
         addTween(attackDuration);
+
+        hurtBox = new Entity();
+        hurtBox.mask = new Hitbox(9, 4);
+        hurtBox.enabled = false;
     }
 
     override public function update() {
         movement();
         animation();
+        hurtBox.enabled = attackDuration.active;
+        if(sprite.flipX) {
+            hurtBox.x = x - 16;
+        }
+        else {
+            hurtBox.x = x + 23;
+        }
+        if(Main.inputCheck("down")) {
+            hurtBox.y = y + 20;
+        }
+        else {
+            hurtBox.y = y + 10;
+        }
         super.update();
     }
 

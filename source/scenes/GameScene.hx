@@ -20,6 +20,7 @@ class GameScene extends Scene {
         placeLevels();
         player = new Player(50, 50);
         add(player);
+        add(player.hurtBox);
         camera.pixelSnapping = true;
         Key.define("togglezoom", [Key.T]);
 	}
