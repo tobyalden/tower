@@ -14,39 +14,41 @@ class Hopper extends TowerEntity {
     public static inline var JUMP_VEL_Y = 300;
     public static inline var GRAVITY = 800;
     public static inline var TIME_BETWEEN_JUMPS = 3;
+    public static inline var JUMP_TELL_DURATION = 0.5;
+    public static inline var LAND_DURATION = 0.2;
 
     private var sprite:Spritemap;
     private var velocity:Vector2;
     private var jumpTimer:Alarm;
+    private var landTimer:Alarm;
     private var wasOnGround:Bool;
 
     public function new(x:Float, y:Float) {
         super(x, y);
         type = "enemy";
         sprite = new Spritemap("graphics/hopper.png", 24, 24);
-        sprite.add("idle", [0, 1], 5);
-        sprite.add("activeidle", [2, 3], 5);
-        sprite.add("jump", [3, 2], 6, false);
+        sprite.add("idle", [0]);
+        sprite.add("active", [2]);
+        sprite.add("crouch", [3]);
+        sprite.add("jump", [2]);
         sprite.add("hit", [4], 6);
         sprite.play("idle");
         sprite.y = -1;
         graphic = sprite;
         mask = new Hitbox(24, 23);
         velocity = new Vector2(0, 0);
-        jumpTimer = new Alarm(TIME_BETWEEN_JUMPS, TweenType.Looping);
+        jumpTimer = new Alarm(TIME_BETWEEN_JUMPS, TweenType.Persist);
         jumpTimer.onComplete.bind(function() {
             jump();
         });
         addTween(jumpTimer);
-        var jumpTimerDelay = new Alarm(Math.random(), TweenType.OneShot);
-        jumpTimerDelay.onComplete.bind(function() {
-            jumpTimer.start();
-        });
-        addTween(jumpTimerDelay, true);
+        landTimer = new Alarm(LAND_DURATION, TweenType.Persist);
+        addTween(landTimer);
         wasOnGround = false;
     }
 
     public override function update() {
+        trace('jumpTimer.active = ${jumpTimer.active}. elapsed = ${jumpTimer.elapsed}. remaining = ${jumpTimer.remaining}. percent = ${jumpTimer.percent}');
         if(isOnCeiling()) {
             // Bonk head
             velocity.y = 0;
@@ -58,6 +60,7 @@ class Hopper extends TowerEntity {
                 }
                 velocity.x = 0;
                 velocity.y = 0;
+                landTimer.start();
             }
         }
         else {
@@ -71,11 +74,28 @@ class Hopper extends TowerEntity {
         if(isOnGround()) {
             var player = scene.getInstance("player");
             if(distanceFrom(player, true) < ACTIVE_RANGE) {
-                sprite.play("activeidle");
+                if(!jumpTimer.active) {
+                    jumpTimer.start();
+                    trace('starting jumpTimer');
+                }
+                if(
+                    jumpTimer.remaining < JUMP_TELL_DURATION
+                    || landTimer.active
+                ) {
+                    sprite.play("crouch");
+                }
+                else {
+                    sprite.play("active");
+                }
             }
             else {
+                jumpTimer.active = false;
+                trace('deactivating jumpTimer');
                 sprite.play("idle");
             }
+        }
+        else {
+            sprite.play("jump");
         }
         super.update();
     }
@@ -97,8 +117,6 @@ class Hopper extends TowerEntity {
         }
         velocity.y = -JUMP_VEL_Y;
         sprite.play("jump");
-        if(isOnScreen()) {
-            //MemoryEntity.allSfx["hopperjump"].play();
-        }
+        //MemoryEntity.allSfx["hopperjump"].play();
     }
 }
