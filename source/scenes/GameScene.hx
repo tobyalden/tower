@@ -23,12 +23,16 @@ class GameScene extends Scene {
         add(player.hurtBox);
         camera.pixelSnapping = true;
         Key.define("togglezoom", [Key.T]);
+        Key.define("reset", [Key.R]);
 	}
 
     override public function update() {
         super.update();
         if(Input.pressed("togglezoom")) {
             camera.scale = camera.scale == 1 ? 0.1 : 1;
+        }
+        if(Input.pressed("reset")) {
+            HXP.scene = new GameScene();
         }
         camera.x = Math.floor(player.centerX - HXP.width / 2);
         camera.y = Math.floor(player.centerY - HXP.height / 2);
