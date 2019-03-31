@@ -4,7 +4,7 @@ import haxepunk.*;
 import haxepunk.graphics.*;
 import haxepunk.graphics.tile.*;
 
-class Spike extends Entity
+class Spike extends TowerEntity
 {
     public static inline var FLOOR = 0;
     public static inline var CEILING = 1;

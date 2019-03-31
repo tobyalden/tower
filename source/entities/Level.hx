@@ -9,7 +9,12 @@ import haxepunk.math.*;
 import openfl.Assets;
 import scenes.*;
 
-class Level extends Entity {
+typedef IntPair = {
+    var x:Int;
+    var y:Int;
+}
+
+class Level extends TowerEntity {
     public static inline var TILE_SIZE = 16;
     public static inline var MIN_LEVEL_WIDTH = 320;
     public static inline var MIN_LEVEL_HEIGHT = 176;
@@ -24,6 +29,7 @@ class Level extends Entity {
     public var entities(default, null):Array<Entity>;
     private var tiles:Tilemap;
     private var levelType:String;
+    private var openFloorSpots:Array<IntPair>;
 
     public function new(x:Int, y:Int, levelType:String) {
         super(x, y);
@@ -54,6 +60,24 @@ class Level extends Entity {
         graphic = tiles;
     }
 
+    public function getOpenFloorCoordinates() {
+        var openFloorSpot = openFloorSpots.pop();
+        for(otherSpot in openFloorSpots) {
+            if(
+                otherSpot.y == openFloorSpot.y
+                && otherSpot.x == openFloorSpot.x + 1
+                || otherSpot.x == openFloorSpot.x - 1
+            ) {
+                // Remove adjacent spots
+                openFloorSpots.remove(otherSpot);
+            }
+        }
+        return new Vector2(
+            x + openFloorSpot.x * TILE_SIZE,
+            y + openFloorSpot.y * TILE_SIZE + TILE_SIZE
+        );
+    }
+
     public function addPathsUp() {
         for(tileX in 0...walls.columns) {
             for(tileY in 0...walls.rows) {
@@ -64,7 +88,8 @@ class Level extends Entity {
         }
     }
 
-    private function findOpenSpotsOnFloor() {
+    public function findOpenSpotsOnFloor() {
+        openFloorSpots = new Array<IntPair>();
         for(tileX in 0...walls.columns) {
             for(tileY in 0...walls.rows) {
                 if(
@@ -75,10 +100,12 @@ class Level extends Entity {
                     && walls.getTile(tileX - 1, tileY + 1) // Floor to left
                     && walls.getTile(tileX + 1, tileY + 1) // Floor to right
                 ) {
-                    tiles.setTile(tileX, tileY, 3);
+                    openFloorSpots.push({x: tileX, y: tileY});
+                    //tiles.setTile(tileX, tileY, 3);
                 }
             }
         }
+        HXP.shuffle(openFloorSpots);
     }
 
     public function flipHorizontally(wallsToFlip:Grid) {
@@ -232,7 +259,6 @@ class Level extends Entity {
                 }
             }
         }
-        findOpenSpotsOnFloor();
         graphic = tiles;
     }
 }

@@ -10,7 +10,7 @@ import haxepunk.tweens.misc.*;
 import haxepunk.utils.*;
 import scenes.*;
 
-class Player extends Entity {
+class Player extends TowerEntity {
     public static inline var RUN_SPEED = 100;
     public static inline var AIR_SPEED = 120;
     public static inline var JUMP_POWER = 300;
@@ -32,6 +32,7 @@ class Player extends Entity {
 
     public function new(x:Int, y:Int) {
 	    super(x, y);
+        name = "player";
         sprite = new Spritemap("graphics/player.png", 48, 33);
         sprite.add("idle", [0]);
         sprite.add("run", [2, 3, 1], 10);
@@ -157,10 +158,6 @@ class Player extends Entity {
 
     private function attack() {
         attackDuration.start();
-    }
-
-    private function isOnGround() {
-        return collide("walls", x, y + 1) != null;
     }
 
     public function animation() {

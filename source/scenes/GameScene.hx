@@ -4,6 +4,7 @@ import entities.*;
 import haxepunk.*;
 import haxepunk.input.*;
 import haxepunk.masks.*;
+import haxepunk.math.*;
 import openfl.Assets;
 
 class GameScene extends Scene {
@@ -21,6 +22,16 @@ class GameScene extends Scene {
         player = new Player(50, 50);
         add(player);
         add(player.hurtBox);
+        for(i in 0...10) {
+            var level = allLevels[Random.randInt(allLevels.length)];
+            var openFloorCoordinates = level.getOpenFloorCoordinates();
+            var hopper = new Hopper(
+                openFloorCoordinates.x, openFloorCoordinates.y
+            );
+            hopper.x -= (hopper.width - Level.TILE_SIZE) / 2;
+            hopper.y -= hopper.height - hopper.originY;
+            add(hopper);
+        }
         camera.pixelSnapping = true;
         Key.define("togglezoom", [Key.T]);
         Key.define("reset", [Key.R]);
@@ -185,6 +196,7 @@ class GameScene extends Scene {
                                     }
                                 }
                                 level.addPathsUp();
+                                level.findOpenSpotsOnFloor();
                                 level.updateGraphic();
                                 add(level);
                                 for(entity in level.entities) {
