@@ -16,6 +16,7 @@ class Hopper extends TowerEntity {
     public static inline var TIME_BETWEEN_JUMPS = 3;
     public static inline var JUMP_TELL_DURATION = 0.5;
     public static inline var LAND_DURATION = 0.2;
+    public static inline var STARTING_HEALTH = 3;
 
     private var sprite:Spritemap;
     private var velocity:Vector2;
@@ -45,10 +46,10 @@ class Hopper extends TowerEntity {
         landTimer = new Alarm(LAND_DURATION, TweenType.Persist);
         addTween(landTimer);
         wasOnGround = false;
+        health = STARTING_HEALTH;
     }
 
     public override function update() {
-        trace('jumpTimer.active = ${jumpTimer.active}. elapsed = ${jumpTimer.elapsed}. remaining = ${jumpTimer.remaining}. percent = ${jumpTimer.percent}');
         if(isOnCeiling()) {
             // Bonk head
             velocity.y = 0;
@@ -71,12 +72,12 @@ class Hopper extends TowerEntity {
             HXP.elapsed * velocity.x, HXP.elapsed * velocity.y,
             ["walls", "enemy"]
         );
+
         if(isOnGround()) {
             var player = scene.getInstance("player");
             if(distanceFrom(player, true) < ACTIVE_RANGE) {
                 if(!jumpTimer.active) {
                     jumpTimer.start();
-                    trace('starting jumpTimer');
                 }
                 if(
                     jumpTimer.remaining < JUMP_TELL_DURATION
@@ -90,12 +91,15 @@ class Hopper extends TowerEntity {
             }
             else {
                 jumpTimer.active = false;
-                trace('deactivating jumpTimer');
                 sprite.play("idle");
             }
         }
         else {
             sprite.play("jump");
+        }
+
+        if(collide("attack", x, y) != null) {
+            takeHit();
         }
         super.update();
     }

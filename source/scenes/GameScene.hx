@@ -22,7 +22,7 @@ class GameScene extends Scene {
         player = new Player(50, 50);
         add(player);
         add(player.hurtBox);
-        for(i in 0...10) {
+        for(i in 0...25) {
             var level = allLevels[Random.randInt(allLevels.length)];
             var openFloorCoordinates = level.getOpenFloorCoordinates();
             var hopper = new Hopper(

@@ -66,9 +66,13 @@ class Player extends TowerEntity {
         attackThisFrame = false;
 
         attackDuration = new Alarm(ATTACK_DURATION, TweenType.Persist);
+        attackDuration.onComplete.bind(function() {
+            hurtBox.enabled = false;
+        });
         addTween(attackDuration);
 
         hurtBox = new Entity();
+        hurtBox.type = "attack";
         hurtBox.mask = new Hitbox(9, 4);
         hurtBox.enabled = false;
     }
@@ -76,7 +80,6 @@ class Player extends TowerEntity {
     override public function update() {
         movement();
         animation();
-        hurtBox.enabled = attackDuration.active;
         if(sprite.flipX) {
             hurtBox.x = x - 16;
         }
@@ -158,6 +161,11 @@ class Player extends TowerEntity {
 
     private function attack() {
         attackDuration.start();
+        hurtBox.enabled = true;
+    }
+
+    public function disableHurtbox() {
+        hurtBox.enabled = false;
     }
 
     public function animation() {
