@@ -36,15 +36,15 @@ class TowerEntity extends Entity {
         health = null;
     }
 
-    private function flash() {
+    private function flash(flashTime:Float = FLASH_TIME) {
         if(!isFlashing) {
             visible = false;
         }
         isFlashing = true;
-        stopFlasher.start();
+        stopFlasher.reset(flashTime);
     }
 
-    private function takeHit() {
+    private function takeHit(source:Entity) {
         // TODO: Add parameter specifying what's hitting them
         if(health != null) {
             flash();

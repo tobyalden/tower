@@ -98,8 +98,9 @@ class Hopper extends TowerEntity {
             sprite.play("jump");
         }
 
-        if(collide("attack", x, y) != null) {
-            takeHit();
+        var attack = collide("attack", x, y);
+        if(attack != null) {
+            takeHit(attack);
         }
         super.update();
     }

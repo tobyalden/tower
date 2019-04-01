@@ -20,6 +20,8 @@ class Player extends TowerEntity {
 
     public static inline var ATTACK_DELAY = 0.15;
     public static inline var ATTACK_DURATION = 0.2;
+    public static inline var HIT_KNOCKBACK = 200;
+    public static inline var FLASH_TIME = 1;
 
     public var hurtBox(default, null):Entity;
     private var sprite:Spritemap;
@@ -95,8 +97,31 @@ class Player extends TowerEntity {
         super.update();
     }
 
-    public function movement() {
+    override private function takeHit(source:Entity) {
+        flash(FLASH_TIME);
+        var knockback:Vector2;
         if(isOnGround()) {
+            knockback = new Vector2(
+                x < source.centerX ? -HIT_KNOCKBACK / 2: HIT_KNOCKBACK / 2,
+                -HIT_KNOCKBACK
+            );
+        }
+        else {
+            knockback = new Vector2(
+                source.centerX - centerX, source.centerY - centerY
+            );
+            knockback.normalize(HIT_KNOCKBACK);
+            knockback.inverse();
+        }
+        velocity = knockback;
+    }
+
+    public function movement() {
+        var enemy = collide("enemy", x, y);
+        if(enemy != null && !isFlashing) {
+            takeHit(enemy);
+        }
+        else if(isOnGround()) {
             if(
                 Main.inputCheck("down")
                 || jumpDelay.active
