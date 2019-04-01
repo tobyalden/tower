@@ -9,11 +9,11 @@ import haxepunk.tweens.misc.*;
 import scenes.*;
 
 class Hopper extends TowerEntity {
-    public static inline var ACTIVE_RANGE = 150;
-    public static inline var JUMP_VEL_X = 140;
-    public static inline var JUMP_VEL_Y = 300;
+    public static inline var ACTIVE_RANGE = 180;
+    public static inline var JUMP_VEL_X = 200;
+    public static inline var JUMP_VEL_Y = 150;
     public static inline var GRAVITY = 800;
-    public static inline var TIME_BETWEEN_JUMPS = 3;
+    public static inline var TIME_BETWEEN_JUMPS = 2;
     public static inline var JUMP_TELL_DURATION = 0.5;
     public static inline var LAND_DURATION = 0.2;
     public static inline var STARTING_HEALTH = 3;
@@ -103,6 +103,16 @@ class Hopper extends TowerEntity {
             takeHit(attack);
         }
         super.update();
+    }
+
+    override public function moveCollideX(e:Entity) {
+        velocity.x = 0;
+        return true;
+    }
+
+    override public function moveCollideY(e:Entity) {
+        velocity.y = 0;
+        return true;
     }
 
     private function jump() {
