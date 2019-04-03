@@ -115,6 +115,7 @@ class Player extends TowerEntity {
             (Main.inputCheck("up") || Main.inputCheck("down"))
             && !attackDelay.active
             && !attackDuration.active
+            && !jumpDelay.active
             && isOnGround()
         );
         if(Main.inputCheck("up")) {
