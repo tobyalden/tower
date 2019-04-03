@@ -70,7 +70,7 @@ class Hopper extends TowerEntity {
         wasOnGround = isOnGround();
         moveBy(
             HXP.elapsed * velocity.x, HXP.elapsed * velocity.y,
-            ["walls", "enemy"]
+            ["walls", "enemy", "shield"]
         );
 
         if(isOnGround()) {
@@ -106,7 +106,13 @@ class Hopper extends TowerEntity {
     }
 
     override public function moveCollideX(e:Entity) {
-        velocity.x = 0;
+        if(e.type == "shield") {
+            velocity.x = -velocity.x * 0.75;
+        }
+        else {
+            velocity.x = 0;
+        }
+        velocity.y = 0;
         return true;
     }
 

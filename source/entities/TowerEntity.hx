@@ -63,6 +63,18 @@ class TowerEntity extends Entity {
         explode(4);
     }
 
+    private function collideMultipleTypes(
+        collideTypes:Array<String>, collideX:Float, collideY:Float
+    ) {
+        for(collideType in collideTypes) {
+            var collidedEntity = collide(collideType, collideX, collideY);
+            if(collidedEntity != null) {
+                return collidedEntity;
+            }
+        }
+        return null;
+    }
+
     private function explode(numExplosions:Int) {
         var directions = new Array<Vector2>();
         for(i in 0...numExplosions) {
@@ -97,11 +109,11 @@ class TowerEntity extends Entity {
     }
 
     private function isOnGround() {
-        return collide("walls", x, y + 1) != null;
+        return collideMultipleTypes(["walls", "shield"], x, y + 1) != null;
     }
 
     private function isOnCeiling() {
-        return collide("walls", x, y - 1) != null;
+        return collideMultipleTypes(["walls", "shield"], x, y - 1) != null;
     }
 
     private function isOnWall() {
@@ -109,11 +121,11 @@ class TowerEntity extends Entity {
     }
 
     private function isOnRightWall() {
-        return collide("walls", x + 1, y) != null;
+        return collideMultipleTypes(["walls", "shield"], x + 1, y) != null;
     }
 
     private function isOnLeftWall() {
-        return collide("walls", x - 1, y) != null;
+        return collideMultipleTypes(["walls", "shield"], x - 1, y) != null;
     }
 
     private function isOnScreen() {

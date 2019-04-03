@@ -12,6 +12,7 @@ import scenes.*;
 
 class Player extends TowerEntity {
     public static inline var RUN_SPEED = 100;
+    public static inline var WALK_SPEED = 50;
     public static inline var AIR_SPEED = 120;
     public static inline var JUMP_POWER = 300;
     public static inline var JUMP_DELAY = 0.15;
@@ -21,9 +22,10 @@ class Player extends TowerEntity {
     public static inline var ATTACK_DELAY = 0.15;
     public static inline var ATTACK_DURATION = 0.2;
     public static inline var HIT_KNOCKBACK = 200;
-    public static inline var FLASH_TIME = 1;
+    public static inline var FLASH_TIME = 2;
 
     public var hurtBox(default, null):Entity;
+    public var shield(default, null):Entity;
     private var sprite:Spritemap;
     private var velocity:Vector2;
     private var jumpDelay:Alarm;
@@ -38,6 +40,7 @@ class Player extends TowerEntity {
         sprite = new Spritemap("graphics/player.png", 48, 33);
         sprite.add("idle", [0]);
         sprite.add("run", [2, 3, 1], 10);
+        sprite.add("walk", [2, 3, 1], 5);
         sprite.add("jump", [9]);
         sprite.add("fall", [10]);
         sprite.add("crouch", [6]);
@@ -77,11 +80,22 @@ class Player extends TowerEntity {
         hurtBox.type = "attack";
         hurtBox.mask = new Hitbox(9, 4);
         hurtBox.enabled = false;
+
+        shield = new Entity();
+        shield.type = "shield";
+        shield.mask = new Hitbox(2, 28);
+        shield.graphic = new ColoredRect(2, 33, 0x0000FF);
     }
 
     override public function update() {
         movement();
         animation();
+        updateHurtBox();
+        updateShield();
+        super.update();
+    }
+
+    private function updateHurtBox() {
         if(sprite.flipX) {
             hurtBox.x = x - 16;
         }
@@ -94,8 +108,34 @@ class Player extends TowerEntity {
         else {
             hurtBox.y = y + 10;
         }
-        super.update();
     }
+
+    private function updateShield() {
+        shield.enabled = (
+            (Main.inputCheck("up") || Main.inputCheck("down"))
+            && !attackDelay.active
+            && !attackDuration.active
+            && isOnGround()
+        );
+        if(Main.inputCheck("up")) {
+            shield.mask = new Hitbox(28, 2);
+            shield.graphic = new ColoredRect(28, 2, 0x0000FF);
+            shield.x = centerX - 14;
+            shield.y = y - 3;
+        }
+        else if(Main.inputCheck("down")) {
+            shield.mask = new Hitbox(2, 28);
+            shield.graphic = new ColoredRect(2, 28, 0x0000FF);
+            if(sprite.flipX) {
+                shield.x = x - 5;
+            }
+            else {
+                shield.x = x + width + 3;
+            }
+            shield.y = y + 5;
+        }
+    }
+
 
     override private function takeHit(source:Entity) {
         flash(FLASH_TIME);
@@ -129,6 +169,17 @@ class Player extends TowerEntity {
                 || attackDuration.active
             ) {
                 velocity.x = 0;
+            }
+            else if(Main.inputCheck("up")) {
+                if(Main.inputCheck("left")) {
+                    velocity.x = -WALK_SPEED;
+                }
+                else if(Main.inputCheck("right")) {
+                    velocity.x = WALK_SPEED;
+                }
+                else {
+                    velocity.x = 0;
+                }
             }
             else if(Main.inputCheck("left")) {
                 velocity.x = -RUN_SPEED;
@@ -217,11 +268,16 @@ class Player extends TowerEntity {
             }
         }
         else if(velocity.x != 0) {
-            sprite.play("run");
+            if(Main.inputCheck("up")) {
+                sprite.play("walk");
+            }
+            else {
+                sprite.play("run");
+            }
             sprite.flipX = velocity.x < 0;
         }
         else {
-            if(Main.inputCheck("down")) {
+            if(Main.inputCheck("down") && !Main.inputCheck("up")) {
                 sprite.play("crouch");
             }
             else {
