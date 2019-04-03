@@ -26,12 +26,23 @@ class GameScene extends Scene {
         for(i in 0...24) {
             var level = allLevels[Random.randInt(allLevels.length)];
             var openFloorCoordinates = level.getOpenFloorCoordinates();
-            var hopper = new Hopper(
-                openFloorCoordinates.x, openFloorCoordinates.y
+            var follower = new Follower(
+                openFloorCoordinates.x, openFloorCoordinates.y - 6
             );
-            hopper.x -= (hopper.width - Level.TILE_SIZE) / 2;
-            hopper.y -= hopper.height - hopper.originY;
-            add(hopper);
+            var hopper = new Hopper(
+                openFloorCoordinates.x, openFloorCoordinates.y - 6
+            );
+            //var enemy = HXP.choose(hopper, follower);
+            var enemy:Entity;
+            if(Math.random() > 0.5) {
+                enemy = hopper;
+            }
+            else {
+                enemy = follower;
+            }
+            enemy.x -= (enemy.width - Level.TILE_SIZE) / 2;
+            enemy.y -= enemy.height - enemy.originY;
+            add(enemy);
         }
         camera.pixelSnapping = true;
         Key.define("togglezoom", [Key.T]);
