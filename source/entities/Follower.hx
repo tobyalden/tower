@@ -4,19 +4,23 @@ import haxepunk.*;
 import haxepunk.graphics.*;
 import haxepunk.masks.*;
 import haxepunk.math.*;
+import haxepunk.Tween;
+import haxepunk.tweens.misc.*;
 import scenes.*;
 
 class Follower extends TowerEntity {
-    public static inline var ACCEL = 40;
-    public static inline var MAX_SPEED = 80;
-    public static inline var BOUNCE_FACTOR = 0.7;
+    public static inline var ACCEL = 100;
+    public static inline var MAX_SPEED = 100;
+    public static inline var BOUNCE_FACTOR = 0.75;
     public static inline var ACTIVATE_DISTANCE = 200;
-    public static inline var HIT_KNOCKBACK = 100;
+    public static inline var KNOCKBACK_SPEED = 100;
+    public static inline var KNOCKBACK_TIME = 1;
 
     private var sprite:Spritemap;
     private var accel:Float;
     private var velocity:Vector2;
     private var isActive:Bool;
+    private var knockbackTimer:Alarm;
 
     public function new(x:Float, y:Float) {
         super(x, y);
@@ -37,6 +41,8 @@ class Follower extends TowerEntity {
         mask = new Hitbox(20, 20);
         isActive = false;
         health = 2;
+        knockbackTimer = new Alarm(KNOCKBACK_TIME, TweenType.Persist);
+        addTween(knockbackTimer);
     }
 
     override public function update() {
@@ -45,17 +51,17 @@ class Follower extends TowerEntity {
         if(distanceFrom(player, true) < ACTIVATE_DISTANCE) {
             isActive = true;
         }
-        var towardsPlayer = new Vector2(
-            player.centerX - centerX, player.centerY - centerY
-        );
-        var accel = ACCEL;
-        //if(distanceFrom(player, true) < 50) {
-            //accel *= 2;
-        //}
-        towardsPlayer.normalize(accel * HXP.elapsed);
-        velocity.add(towardsPlayer);
-        if(velocity.length > MAX_SPEED) {
-            velocity.normalize(MAX_SPEED);
+        trace('knockbackTimer.active = ${knockbackTimer.active}');
+        if(!knockbackTimer.active) {
+            var towardsPlayer = new Vector2(
+                player.centerX - centerX, player.centerY - centerY
+            );
+            var accel = ACCEL;
+            towardsPlayer.normalize(accel * HXP.elapsed);
+            velocity.add(towardsPlayer);
+            if(velocity.length > MAX_SPEED) {
+                velocity.normalize(MAX_SPEED);
+            }
         }
         if(isActive) {
             moveBy(
@@ -77,9 +83,10 @@ class Follower extends TowerEntity {
         var awayFromPlayer = new Vector2(
             player.centerX - centerX, player.centerY - centerY
         );
-        awayFromPlayer.normalize(HIT_KNOCKBACK);
+        awayFromPlayer.normalize(KNOCKBACK_SPEED);
         awayFromPlayer.inverse();
         velocity = awayFromPlayer;
+        knockbackTimer.start();
         super.takeHit(source);
     }
 
