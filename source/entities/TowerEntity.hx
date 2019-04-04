@@ -120,6 +120,20 @@ class TowerEntity extends Entity {
         }
     }
 
+    private function isBottomLeftCornerOnGround() {
+        var bottomLeftCorner = new Vector2(left, bottom);
+        return scene.collidePoint(
+            "walls", bottomLeftCorner.x, bottomLeftCorner.y
+        ) != null;
+    }
+
+    private function isBottomRightCornerOnGround() {
+        var bottomRightCorner = new Vector2(right, bottom);
+        return scene.collidePoint(
+            "walls", bottomRightCorner.x, bottomRightCorner.y
+        ) != null;
+    }
+
     private function isOnGround() {
         return collideMultipleTypes(["walls", "shield"], x, y + 1) != null;
     }

@@ -158,9 +158,13 @@ class Player extends TowerEntity {
     }
 
     public function movement() {
-        var enemy = collide("enemy", x, y);
+        var enemy = collideMultipleTypes(["enemy", "wizardfireball"], x, y);
+        var spike = collide("floorspike", x, y);
         if(enemy != null && !isFlashing) {
             takeHit(enemy);
+            if(enemy.type == "wizardfireball") {
+                cast(enemy, WizardFireball).blowUp;
+            }
         }
         var spike = collideMultipleTypes(["floorspike"], x, y);
         if(spike != null && cast(spike, FloorSpike).isActive) {
