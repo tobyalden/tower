@@ -162,6 +162,10 @@ class Player extends TowerEntity {
         if(enemy != null && !isFlashing) {
             takeHit(enemy);
         }
+        var spike = collideMultipleTypes(["floorspike"], x, y);
+        if(spike != null && cast(spike, FloorSpike).isActive) {
+            takeHit(spike);
+        }
         else if(isOnGround()) {
             if(
                 Main.inputCheck("down")

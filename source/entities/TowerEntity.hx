@@ -10,6 +10,18 @@ import scenes.*;
 class TowerEntity extends Entity {
     public static inline var FLASH_TIME = 0.4;
 
+    static public var allSfx(default, null):Map<String, Sfx> = (
+        new Map<String, Sfx>()
+    );
+
+    static public function loadSfx(sfxNames:Array<String>) {
+        for(sfxName in sfxNames) {
+            if(allSfx.exists(sfxName)) {
+                continue;
+            }
+            allSfx[sfxName] = new Sfx('audio/${sfxName}.wav');
+        }
+    }
     private var isFlashing:Bool;
     private var flasher:Alarm;
     private var stopFlasher:Alarm;
