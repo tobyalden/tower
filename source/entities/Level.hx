@@ -30,6 +30,7 @@ class Level extends TowerEntity {
     private var tiles:Tilemap;
     private var levelType:String;
     private var openFloorSpots:Array<IntPair>;
+    private var openCeilingSpots:Array<IntPair>;
 
     public function new(x:Int, y:Int, levelType:String) {
         super(x, y);
@@ -74,7 +75,25 @@ class Level extends TowerEntity {
         }
         return new Vector2(
             x + openFloorSpot.x * TILE_SIZE,
-            y + openFloorSpot.y * TILE_SIZE + TILE_SIZE
+            y + openFloorSpot.y * TILE_SIZE
+        );
+    }
+
+    public function getOpenCeilingCoordinates() {
+        var openCeilingSpot = openCeilingSpots.pop();
+        for(otherSpot in openCeilingSpots) {
+            if(
+                otherSpot.y == openCeilingSpot.y
+                && otherSpot.x == openCeilingSpot.x + 1
+                || otherSpot.x == openCeilingSpot.x - 1
+            ) {
+                // Remove adjacent spots
+                openCeilingSpots.remove(otherSpot);
+            }
+        }
+        return new Vector2(
+            x + openCeilingSpot.x * TILE_SIZE,
+            y + openCeilingSpot.y * TILE_SIZE
         );
     }
 
@@ -106,6 +125,24 @@ class Level extends TowerEntity {
             }
         }
         HXP.shuffle(openFloorSpots);
+    }
+
+    public function findOpenSpotsOnCeiling() {
+        openCeilingSpots = new Array<IntPair>();
+        for(tileX in 0...walls.columns) {
+            for(tileY in 0...walls.rows) {
+                if(
+                    !walls.getTile(tileX, tileY) // Is open
+                    && !walls.getTile(tileX - 1, tileY) // Open to left
+                    && !walls.getTile(tileX + 1, tileY) // Open to right
+                    && walls.getTile(tileX, tileY - 1) // Ceiling above
+                ) {
+                    openCeilingSpots.push({x: tileX, y: tileY});
+                    tiles.setTile(tileX, tileY, 3);
+                }
+            }
+        }
+        HXP.shuffle(openCeilingSpots);
     }
 
     public function flipHorizontally(wallsToFlip:Grid) {
