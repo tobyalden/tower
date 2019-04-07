@@ -163,11 +163,10 @@ class Player extends TowerEntity {
         if(enemy != null && !isFlashing) {
             takeHit(enemy);
             if(enemy.type == "wizardfireball") {
-                cast(enemy, WizardFireball).blowUp;
+                cast(enemy, WizardFireball).blowUp();
             }
         }
-        var spike = collideMultipleTypes(["floorspike"], x, y);
-        if(spike != null && cast(spike, FloorSpike).isActive) {
+        else if(spike != null && cast(spike, FloorSpike).isActive) {
             takeHit(spike);
         }
         else if(isOnGround()) {

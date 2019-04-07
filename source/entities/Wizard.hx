@@ -78,7 +78,9 @@ class Wizard extends TowerEntity {
             if(willGoOffEdge()) {
                 velocity.x = -velocity.x;
             }
-            moveBy(velocity.x * HXP.elapsed, 0, ["walls", "shield"]);
+            if(!isFlashing) {
+                moveBy(velocity.x * HXP.elapsed, 0, ["walls", "shield"]);
+            }
             animation();
         }
         // If the the player is on our platform and in range, fire
@@ -98,7 +100,9 @@ class Wizard extends TowerEntity {
             velocity.x = centerX < player.centerX ? -IDLE_SPEED : IDLE_SPEED;
             if(!willGoOffEdge() && !isOnWall()) {
                 // Run away if you can
-                moveBy(velocity.x * HXP.elapsed, 0, ["walls", "shield"]);
+                if(!isFlashing) {
+                    moveBy(velocity.x * HXP.elapsed, 0, ["walls", "shield"]);
+                }
                 animation();
             }
             else {
