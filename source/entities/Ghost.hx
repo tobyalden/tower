@@ -23,7 +23,7 @@ class Ghost extends TowerEntity {
         sprite.play("idle");
         graphic = sprite;
         velocity = new Vector2(0, 0);
-        setHitbox(30, 30);
+        mask = new Hitbox(30, 30);
         isActive = false;
         health = 1;
     }
